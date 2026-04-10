@@ -1,0 +1,272 @@
+{
+  "metadata": {
+    "name": "adult_asthma_rules_seed",
+    "version": "2026-04-09",
+    "population": "adults_18_plus",
+    "primary_guideline": "GINA 2025",
+    "vaccine_default_region": "US",
+    "notes": [
+      "Use deterministic rules for diagnosis and treatment selection.",
+      "Use source versioning and configurable local overrides for formulary and vaccine schedules."
+    ]
+  },
+  "diagnosis": {
+    "requires_typical_symptoms": true,
+    "symptom_features": [
+      "wheeze",
+      "shortness_of_breath",
+      "chest_tightness",
+      "cough",
+      "night_worsening",
+      "exercise_trigger",
+      "allergen_trigger",
+      "viral_trigger"
+    ],
+    "objective_confirmation_any_of": [
+      {
+        "id": "bd_spirometry",
+        "label": "Positive bronchodilator response",
+        "criteria": {
+          "adult_fev1_or_fvc_percent_change_min": 12,
+          "adult_fev1_or_fvc_ml_change_min": 200,
+          "adult_fev1_or_fvc_predicted_value_change_percent_gt": 10,
+          "higher_confidence_percent_change": 15,
+          "higher_confidence_ml_change": 400
+        }
+      },
+      {
+        "id": "pef_variability",
+        "label": "Excessive peak flow variability",
+        "criteria": {
+          "adult_average_diurnal_pef_variability_percent_gt": 10
+        }
+      },
+      {
+        "id": "ics_response",
+        "label": "Improvement after 4 weeks of ICS-containing treatment",
+        "criteria": {
+          "adult_fev1_percent_change_min": 12,
+          "adult_fev1_ml_change_min": 200,
+          "adult_pef_change_percent_min": 20
+        }
+      },
+      {
+        "id": "bronchoprovocation",
+        "label": "Positive bronchoprovocation",
+        "criteria": {
+          "methacholine_fev1_fall_percent_min": 20,
+          "hyperventilation_hypertonic_saline_mannitol_fev1_fall_percent_min": 15,
+          "exercise_fev1_fall_percent_gt": 10,
+          "exercise_fev1_fall_ml_gt": 200
+        }
+      }
+    ],
+    "challenge_test_guardrails": [
+      "If FEV1 falls during challenge testing, confirm FEV1/FVC also falls.",
+      "Do not overrule objective uncertainty without documenting clinical urgency."
+    ]
+  },
+  "control_assessment": {
+    "lookback_weeks": 4,
+    "items": [
+      "daytime_symptoms_more_than_twice_per_week",
+      "night_waking_due_to_asthma",
+      "saba_use_more_than_twice_per_week",
+      "activity_limitation_due_to_asthma"
+    ],
+    "classification": {
+      "well_controlled": 0,
+      "partly_controlled_min": 1,
+      "partly_controlled_max": 2,
+      "uncontrolled_min": 3,
+      "uncontrolled_max": 4
+    }
+  },
+  "track1_adult": {
+    "preferred_reliever": "budesonide-formoterol",
+    "step_1_2": {
+      "label": "AIR-only",
+      "medication": "budesonide-formoterol",
+      "strength_metered": "200/6 mcg",
+      "strength_delivered": "160/4.5 mcg",
+      "route": "inhaled_dpi_or_pmdi",
+      "maintenance": null,
+      "reliever": "1 inhalation as needed",
+      "max_total_inhalations_per_day": 12,
+      "allow_pre_exercise_use": true,
+      "allow_pre_allergen_use": true
+    },
+    "start_at_step_3_if_any": [
+      "symptoms_most_days",
+      "night_waking_more_than_once_weekly",
+      "current_smoker",
+      "impaired_perception_of_bronchoconstriction",
+      "recent_severe_exacerbation",
+      "history_life_threatening_exacerbation",
+      "severe_airway_hyperresponsiveness",
+      "current_seasonal_allergic_trigger"
+    ],
+    "step_3": {
+      "label": "low_dose_mart",
+      "medication": "budesonide-formoterol",
+      "strength_metered": "200/6 mcg",
+      "strength_delivered": "160/4.5 mcg",
+      "route": "inhaled_dpi_or_pmdi",
+      "maintenance_options": [
+        "1 inhalation once daily",
+        "1 inhalation twice daily"
+      ],
+      "reliever": "1 inhalation as needed",
+      "max_total_inhalations_per_day": 12
+    },
+    "step_4": {
+      "label": "medium_dose_mart",
+      "medication": "budesonide-formoterol",
+      "strength_metered": "200/6 mcg",
+      "strength_delivered": "160/4.5 mcg",
+      "route": "inhaled_dpi_or_pmdi",
+      "maintenance": "2 inhalations twice daily",
+      "reliever": "1 inhalation as needed",
+      "max_total_inhalations_per_day": 12
+    },
+    "step_5": {
+      "label": "specialist_escalation",
+      "actions": [
+        "refer_for_expert_assessment",
+        "phenotype_for_severe_asthma",
+        "consider_add_on_therapy",
+        "do_not_blindly_keep_escalating_without_reassessment"
+      ]
+    }
+  },
+  "severe_asthma": {
+    "difficult_to_treat_trigger": [
+      "persistent_symptoms_or_exacerbations_despite_medium_or_high_dose_ics_laba",
+      "maintenance_ocs_use"
+    ],
+    "optimization_steps": [
+      "confirm_diagnosis",
+      "correct_inhaler_technique",
+      "address_adherence",
+      "treat_comorbidities",
+      "address_smoking_and_exposures",
+      "switch_to_mart_if_available",
+      "consider_non_biologic_add_ons",
+      "trial_high_dose_ics_laba_3_to_6_months_if_not_already_used"
+    ],
+    "type2_high_markers_any": {
+      "blood_eosinophils_gte_per_uL": 150,
+      "feno_gte_ppb": 20,
+      "sputum_eosinophils_gte_percent": 2,
+      "clinically_allergen_driven": true
+    },
+    "biologics": [
+      {
+        "name": "omalizumab",
+        "route": "subcutaneous",
+        "dose": "every 2-4 weeks, based on weight and serum IgE",
+        "phenotype": "severe_allergic_asthma"
+      },
+      {
+        "name": "mepolizumab",
+        "route": "subcutaneous",
+        "dose": "100 mg every 4 weeks",
+        "phenotype": "severe_eosinophilic_asthma"
+      },
+      {
+        "name": "benralizumab",
+        "route": "subcutaneous",
+        "dose": "30 mg every 4 weeks for 3 doses, then every 8 weeks",
+        "phenotype": "severe_eosinophilic_asthma"
+      },
+      {
+        "name": "reslizumab",
+        "route": "intravenous",
+        "dose": "3 mg/kg every 4 weeks",
+        "phenotype": "severe_eosinophilic_asthma"
+      },
+      {
+        "name": "dupilumab",
+        "route": "subcutaneous",
+        "dose": "200 mg or 300 mg every 2 weeks; 300 mg every 2 weeks if OCS-dependent",
+        "phenotype": "severe_eosinophilic_or_type2_or_ocs_dependent"
+      },
+      {
+        "name": "tezepelumab",
+        "route": "subcutaneous",
+        "dose": "210 mg every 4 weeks",
+        "phenotype": "severe_asthma_with_recent_exacerbations"
+      }
+    ],
+    "other_add_ons": [
+      {
+        "name": "lama",
+        "route": "inhaled",
+        "notes": [
+          "ensure at least medium-dose ICS-LABA first",
+          "common adverse effects include dry mouth and urinary retention"
+        ]
+      },
+      {
+        "name": "azithromycin",
+        "route": "oral",
+        "dose": "500 mg three times weekly",
+        "notes": [
+          "specialist use",
+          "check sputum for atypical mycobacteria",
+          "check QTc before treatment and after 1 month",
+          "consider antimicrobial resistance"
+        ]
+      },
+      {
+        "name": "maintenance_prednisone_equivalent",
+        "route": "oral",
+        "dose": "<=7.5 mg/day as last resort",
+        "notes": [
+          "monitor for adrenal suppression and osteoporosis",
+          "use only after other options, including biologics when available"
+        ]
+      }
+    ]
+  },
+  "vaccines_us_default": {
+    "influenza": {
+      "recommendation": "annual"
+    },
+    "covid19": {
+      "recommendation": "follow_current_local_or_cdc_schedule",
+      "hardcode_dose_count": false
+    },
+    "pneumococcal": {
+      "recommend_if": [
+        "age_gte_50",
+        "age_19_to_49_with_asthma_or_other_chronic_lung_disease"
+      ],
+      "default_options_if_vaccine_naive": [
+        "PCV20_once",
+        "PCV21_once",
+        "PCV15_then_PPSV23"
+      ]
+    },
+    "rsv": {
+      "recommend_if": [
+        "age_gte_75",
+        "age_50_to_74_with_increased_risk_including_asthma"
+      ],
+      "is_annual": false
+    },
+    "zoster": {
+      "recommend_if": [
+        "age_gte_50"
+      ],
+      "series": "2_dose_shingrix"
+    },
+    "tdap_td": {
+      "recommend_if": [
+        "no_documented_adult_tdap",
+        "last_tetanus_containing_vaccine_gte_10_years_ago"
+      ],
+      "default_rule": "one_time_tdap_then_td_or_tdap_every_10_years"
+    }
+  }
+}
